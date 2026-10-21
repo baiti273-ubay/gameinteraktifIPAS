@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Petualangan IPAS & Aturan Rumah - SDIT AZ-ZAHRA</title>
+    <!-- Tailwind CSS untuk styling modern -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome untuk ikon menarik -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Fredoka & Quicksand agar tampilan sangat ramah anak -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Quicksand:wght@600;700&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti untuk efek kemenangan -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brandPink: '#FF6B9B',
+                        brandYellow: '#FFD166',
+                        brandGreen: '#06D6A0',
+                        brandBlue: '#118AB2',
+                        brandPurple: '#8338EC',
+                        brandOrange: '#FF9F1C'
+                    },
+                    fontFamily: {
+                        fredoka: ['Fredoka', 'sans-serif'],
+                        quicksand: ['Quicksand', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Fredoka', cursive, sans-serif;
+            background: linear-gradient(135deg, #a8edd9 0%, #fed6e3 100%);
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* Animasi Kustom */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(2deg); }
+        }
+
+        @keyframes bounce-short {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .animate-bounce-short {
+            animation: bounce-short 1s ease-in-out infinite;
+        }
+
+        .card-shadow {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Glassmorphism effect */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(10px);
+            border: 4px solid #ffffff;
+        }
+
+        /* Responsive max-width untuk simulasi tampilan HP */
+        .mobile-container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col justify-between p-2 sm:p-4">
+
+    <!-- Container Utama Sesuai Ukuran Layar HP -->
+    <div class="mobile-container w-full flex flex-col justify-between flex-grow relative">
+
+        <!-- HEADER APLIKASI -->
+        <header class="text-center pt-2 pb-1 relative z-10">
+            <div class="bg-white/90 backdrop-blur-md rounded-2xl p-3 shadow-md border-2 border-emerald-300 flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <div class="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center text-white text-xl font-bold shadow">
+                        <i class="fas fa-flask-vial"></i>
+                    </div>
+                    <div class="text-left">
+                        <h1 class="text-base font-bold text-emerald-600 leading-tight">IPAS: Perubahan Wujud Benda</h1>
+                        <p class="text-[11px] text-slate-500 font-semibold">Kelas 3 SDIT AZ-ZAHRA</p>
+                    </div>
+                </div>
+                <button id="soundToggle" onclick="toggleSound()" class="w-10 h-10 bg-amber-100 hover:bg-amber-200 text-amber-700 rounded-full flex items-center justify-center text-lg transition">
+                    <i class="fas fa-volume-up" id="soundIcon"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- AREA UTAMA PERMAINAN (DYNAMIC SCREENS) -->
+        <main class="flex-grow flex flex-col justify-center my-3 relative z-10">
+
+            <!-- 1. SCREEN SELAMAT DATANG / REGISTER -->
+            <div id="screenStart" class="glass-panel rounded-3xl p-5 text-center card-shadow flex flex-col justify-between">
+                <div>
+                    <!-- Karakter Kartun -->
+                    <div class="relative w-32 h-32 mx-auto mb-2 animate-float">
+                        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=BundaBaitiAZZahra&backgroundColor=b6e3f4" alt="Karakter Kartun Bunda Baiti" class="w-full h-full rounded-full border-4 border-teal-400 bg-teal-100 p-1 shadow-lg">
+                        <span class="absolute -bottom-2 -right-2 bg-pink-500 text-white rounded-full px-2.5 py-1 text-[10px] font-bold shadow">
+                            <i class="fas fa-school mr-0.5"></i> AZ-ZAHRA
+                        </span>
+                    </div>
+
+                    <h2 class="text-xl font-bold text-teal-700 mb-1">Petualangan Sains Pintar!</h2>
+                    <p class="text-xs text-slate-600 mb-4">Yuk belajar Perubahan Fisik & Perubahan Kimia bersama Bunda Baiti!</p>
+
+                    <!-- Form Input Name -->
+                    <div class="space-y-3 text-left mb-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1 pl-1">
+                                <i class="fas fa-user text-teal-500 mr-1"></i> Nama Lengkap Siswa:
+                            </label>
+                            <input type="text" id="playerName" placeholder="Tulis namamu di sini..." class="w-full px-4 py-3 rounded-xl border-2 border-teal-200 focus:border-teal-500 focus:outline-none font-semibold text-slate-700 bg-white/90 text-sm shadow-inner">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1 pl-1">
+                                <i class="fas fa-graduation-cap text-blue-500 mr-1"></i> Kelas / No. Absen:
+                            </label>
+                            <input type="text" id="playerClass" placeholder="Contoh: 3 AZ-ZAHRA / 12" class="w-full px-4 py-3 rounded-xl border-2 border-teal-200 focus:border-teal-500 focus:outline-none font-semibold text-slate-700 bg-white/90 text-sm shadow-inner">
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="startGame()" class="w-full py-3.5 px-6 bg-gradient-to-r from-teal-400 to-emerald-500 hover:from-teal-500 hover:to-emerald-600 text-white rounded-2xl font-bold text-lg shadow-lg border-b-4 border-teal-700 transform active:scale-95 transition flex items-center justify-center space-x-2">
+                    <span>Mulai Bermain</span>
+                    <i class="fas fa-play-circle text-xl"></i>
+                </button>
+            </div>
+
+            <!-- 2. SCREEN PILIH LEVEL -->
+            <div id="screenLevel" class="hidden glass-panel rounded-3xl p-5 text-center card-shadow">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-bold text-teal-700 flex items-center">
+                        <i class="fas fa-map-marked-alt text-amber-500 mr-2"></i> Pilih Level
+                    </h2>
+                    <span id="playerBadge" class="bg-teal-100 text-teal-700 font-bold px-3 py-1 rounded-full text-xs">
+                        Siswa
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 gap-3 mb-4" id="levelButtonsContainer">
+                    <!-- Level Buttons generated via JS -->
+                </div>
+
+                <div class="p-3 bg-teal-50 rounded-xl border border-teal-200 text-xs text-teal-800 text-left flex items-start space-x-2">
+                    <i class="fas fa-lightbulb text-amber-500 text-base mt-0.5"></i>
+                    <p>Selesaikan Level 1 (Perubahan Fisik) terlebih dahulu untuk membuka Level 2 (Perubahan Kimia)!</p>
+                </div>
+            </div>
+
+            <!-- 3. SCREEN GAMEPLAY (SOAL) -->
+            <div id="screenQuiz" class="hidden glass-panel rounded-3xl p-4 card-shadow flex flex-col justify-between">
+                <div>
+                    <!-- Header Soal (Progress & Score) -->
+                    <div class="flex items-center justify-between mb-3 bg-slate-100/80 p-2.5 rounded-2xl border border-slate-200">
+                        <div class="flex items-center space-x-2">
+                            <span id="levelBadge" class="px-2.5 py-1 bg-teal-600 text-white font-bold rounded-lg text-xs shadow">
+                                Level 1
+                            </span>
+                            <span id="questionProgress" class="text-xs font-bold text-slate-600">
+                                Soal 1/10
+                            </span>
+                        </div>
+                        <div class="flex items-center space-x-1 font-bold text-amber-600 text-sm">
+                            <i class="fas fa-star text-amber-400 text-base"></i>
+                            <span id="currentScore">Skor: 0</span>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="w-full bg-slate-200 rounded-full h-2.5 mb-4 overflow-hidden">
+                        <div id="progressBar" class="bg-gradient-to-r from-teal-400 to-emerald-500 h-2.5 rounded-full transition-all duration-300" style="width: 10%"></div>
+                    </div>
+
+                    <!-- Ilustrasi Kartun / Gambar Pertanyaan dengan Teks Label di Bawahnya -->
+                    <div class="text-center mb-3">
+                        <div id="questionImageContainer" class="w-32 h-32 mx-auto mb-2 bg-gradient-to-br from-teal-100 to-emerald-100 rounded-2xl flex flex-col items-center justify-center p-2 border-2 border-teal-300 shadow-sm animate-bounce-short">
+                            <i id="questionIcon" class="fas fa-cube text-4xl text-teal-600 mb-1"></i>
+                            <span id="questionImageText" class="text-[10px] font-extrabold text-teal-800 bg-white/90 px-2 py-0.5 rounded-md border border-teal-200 shadow-xs">
+                                Label Gambar
+                            </span>
+                        </div>
+                        <h3 id="questionText" class="text-sm font-bold text-slate-800 leading-snug px-1">
+                            Pertanyaan akan muncul di sini...
+                        </h3>
+                    </div>
+
+                    <!-- Pilihan Jawaban (Diacak) -->
+                    <div id="optionsContainer" class="space-y-2">
+                        <!-- Tombol pilihan dibuat secara dinamis oleh JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Feedback Visual Jawaban -->
+                <div id="feedbackBox" class="hidden mt-3 p-2.5 rounded-2xl text-center font-bold text-xs flex items-center justify-center space-x-2">
+                    <i id="feedbackIcon" class="text-lg"></i>
+                    <span id="feedbackText"></span>
+                </div>
+            </div>
+
+            <!-- 4. SCREEN HASIL AKHIR -->
+            <div id="screenResult" class="hidden glass-panel rounded-3xl p-5 text-center card-shadow">
+                <div class="w-28 h-28 mx-auto mb-3 relative">
+                    <img id="resultMascot" src="https://api.dicebear.com/7.x/bottts/svg?seed=BundaBaitiAZZahra&backgroundColor=b6e3f4" alt="Hasil Bunda Baiti" class="w-full h-full rounded-full border-4 border-emerald-400 bg-emerald-50 p-1 shadow-lg">
+                    <div class="absolute -bottom-1 -right-1 bg-amber-400 text-amber-900 font-bold p-2 rounded-full text-xs shadow">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                </div>
+
+                <h2 class="text-2xl font-bold text-slate-800 mb-1">MasyaAllah, Hebat!</h2>
+                <p class="text-xs text-slate-600 mb-3">Kamu telah menyelesaikan game IPAS SDIT AZ-ZAHRA!</p>
+
+                <!-- Box Detail Nilai -->
+                <div class="bg-gradient-to-br from-teal-50 to-emerald-50 rounded-2xl p-4 border-2 border-teal-200 mb-4 shadow-inner">
+                    <p class="text-xs font-bold text-teal-600 uppercase tracking-wider mb-1">Total Nilai Kamu</p>
+                    <div class="text-4xl font-extrabold text-teal-700 mb-2" id="finalScore">100</div>
+                    
+                    <div class="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-teal-200">
+                        <div class="bg-white p-2 rounded-xl border border-teal-100">
+                            <span class="block text-slate-400 font-semibold">Total Benar</span>
+                            <span class="font-bold text-green-600 text-sm" id="correctCount">20/20</span>
+                        </div>
+                        <div class="bg-white p-2 rounded-xl border border-teal-100">
+                            <span class="block text-slate-400 font-semibold">Predikat</span>
+                            <span class="font-bold text-teal-600 text-sm" id="scorePredicate">Sangat Baik</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="space-y-2.5">
+                    <!-- Kirim Hasil ke Bunda Baiti -->
+                    <button onclick="sendToWhatsApp()" class="w-full py-3 px-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-bold text-sm shadow-md border-b-4 border-emerald-700 active:scale-95 transition flex items-center justify-center space-x-2">
+                        <i class="fab fa-whatsapp text-xl"></i>
+                        <span>Kirim Hasil ke Bunda Baiti</span>
+                    </button>
+
+                    <!-- Main Lagi -->
+                    <button onclick="restartGame()" class="w-full py-3 px-4 bg-amber-400 hover:bg-amber-500 text-amber-950 rounded-xl font-bold text-sm shadow-md border-b-4 border-amber-600 active:scale-95 transition flex items-center justify-center space-x-2">
+                        <i class="fas fa-redo"></i>
+                        <span>Main Lagi dari Awal</span>
+                    </button>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- FOOTER / HAK CIPTA & DEVELOPER -->
+        <footer class="text-center py-2 relative z-10">
+            <div class="bg-white/60 backdrop-blur-sm py-2 px-4 rounded-xl border border-white/80 shadow-sm inline-block">
+                <p class="text-[11px] font-bold text-slate-600">
+                    <i class="fas fa-heart text-pink-500 mr-1"></i>Dikembangkan oleh:
+                    <span class="text-teal-600 font-extrabold block sm:inline">Bunda Baiti</span>
+                </p>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- AUDIO EFFECTS (Web Audio API Synthesizer) -->
+    <script>
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+        let soundEnabled = true;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new AudioContext();
+            }
+        }
+
+        function playSound(type) {
+            if (!soundEnabled) return;
+            initAudio();
+
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'correct') {
+                const now = audioCtx.currentTime;
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.1);
+                osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.2);
+                osc.frequency.exponentialRampToValueAtTime(1046.50, now + 0.3);
+
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+
+                osc.start(now);
+                osc.stop(now + 0.5);
+            } else if (type === 'wrong') {
+                const now = audioCtx.currentTime;
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, now);
+                osc.frequency.setValueAtTime(164.81, now + 0.15);
+
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+
+                osc.start(now);
+                osc.stop(now + 0.4);
+            } else if (type === 'click') {
+                const now = audioCtx.currentTime;
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(400, now);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+
+                osc.start(now);
+                osc.stop(now + 0.08);
+            } else if (type === 'win') {
+                const now = audioCtx.currentTime;
+                const notes = [523.25, 659.25, 783.99, 1046.50, 880, 1046.50];
+                const times = [0, 0.12, 0.24, 0.36, 0.5, 0.65];
+
+                notes.forEach((freq, idx) => {
+                    const o = audioCtx.createOscillator();
+                    const g = audioCtx.createGain();
+                    o.connect(g);
+                    g.connect(audioCtx.destination);
+                    o.frequency.value = freq;
+                    g.gain.setValueAtTime(0.2, now + times[idx]);
+                    g.gain.exponentialRampToValueAtTime(0.01, now + times[idx] + 0.25);
+                    o.start(now + times[idx]);
+                    o.stop(now + times[idx] + 0.25);
+                });
+            }
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const soundIcon = document.getElementById('soundIcon');
+            if (soundEnabled) {
+                soundIcon.className = 'fas fa-volume-up';
+                playSound('click');
+            } else {
+                soundIcon.className = 'fas fa-volume-mute';
+            }
+        }
+    </script>
+
+    <!-- DATA SOAL & LOGIKA PERMAINAN -->
+    <script>
+        const quizData = [
+            // LEVEL 1: Perubahan Fisik Benda (10 Soal IPAS)
+            {
+                level: 1,
+                title: "Level 1: Perubahan Fisik Benda",
+                description: "IPAS - Perubahan wujud tanpa membentuk zat baru",
+                color: "from-teal-500 to-cyan-500",
+                questions: [
+                    {
+                        icon: "fa-ice-cream",
+                        imageLabel: "Es Batu Mencair",
+                        question: "Es batu diletakkan di piring terbuka dan berubah menjadi air padat ke cair. Perubahan wujud ini disebut...",
+                        options: ["Mencair", "Membeku", "Menguap", "Mengembun"],
+                        answer: 0,
+                        explanation: "Mencair adalah perubahan wujud dari benda padat menjadi benda cair."
+                    },
+                    {
+                        icon: "fa-cube",
+                        imageLabel: "Air Menjadi Es Batu",
+                        question: "Air murni yang dimasukkan ke dalam freezer kulkas membeku menjadi es batu. Proses ini dinamakan...",
+                        options: ["Membeku", "Mencair", "Menguap", "Menyublim"],
+                        answer: 0,
+                        explanation: "Membeku adalah perubahan wujud dari benda cair menjadi benda padat."
+                    },
+                    {
+                        icon: "fa-cloud-showers-water",
+                        imageLabel: "Air Mendidih Beruap",
+                        question: "Saat memasak air hingga mendidih, uap air tampak naik ke atas. Perubahan dari cair menjadi gas ini disebut...",
+                        options: ["Menguap", "Mengembun", "Membeku", "Mencair"],
+                        answer: 0,
+                        explanation: "Menguap terjadi ketika cairan dipanaskan dan berubah menjadi uap atau gas."
+                    },
+                    {
+                        icon: "fa-droplet",
+                        imageLabel: "Titik Air di Gelas Dingin",
+                        question: "Di bagian luar gelas berisi air es terdapat bintik-bintik air. Perubahan dari uap gas menjadi cair dinamakan...",
+                        options: ["Mengembun", "Menguap", "Mencair", "Mengkristal"],
+                        answer: 0,
+                        explanation: "Mengembun terjadi saat uap air mengenai permukaan yang lebih dingin."
+                    },
+                    {
+                        icon: "fa-wind",
+                        imageLabel: "Kapur Barus Lemari",
+                        question: "Kapur barus di dalam lemari pakaian lama-lama mengecil dan menyebarkan wangi. Perubahan dari padat menjadi gas dinamakan...",
+                        options: ["Menyublim", "Menguap", "Mencair", "Membeku"],
+                        answer: 0,
+                        explanation: "Menyublim adalah perubahan wujud langsung dari padat menjadi gas."
+                    },
+                    {
+                        icon: "fa-fire-flame-simple",
+                        imageLabel: "Lilin Meleleh",
+                        question: "Lilin yang dibakar meleleh menjadi cairan lilin, lalu saat dingin akan mengeras lagi. Ini termasuk...",
+                        options: ["Perubahan Fisik", "Perubahan Kimia", "Pembusukan", "Pelapukan"],
+                        answer: 0,
+                        explanation: "Lilin meleleh adalah perubahan fisik karena bentuknya bisa kembali mengeras."
+                    },
+                    {
+                        icon: "fa-utensils",
+                        imageLabel: "Mentega Dipanaskan",
+                        question: "Mentega padat dipanaskan di wajan menggoreng. Mentega akan mencair namun tetap bersifat mentega. Perubahan ini adalah...",
+                        options: ["Perubahan Fisik", "Perubahan Kimia", "Pembakaran", "Pembusukan"],
+                        answer: 0,
+                        explanation: "Perubahan wujud mentega dari padat ke cair adalah perubahan fisik."
+                    },
+                    {
+                        icon: "fa-sun",
+                        imageLabel: "Garam dari Air Laut",
+                        question: "Petani menjemur air laut di bawah sinar matahari hingga air menguap dan menyisakan kristal garam. Proses ini dinamakan...",
+                        options: ["Mengristal / Pengkristalan", "Pembakaran", "Pembusukan", "Pelapukan"],
+                        answer: 0,
+                        explanation: "Pengkristalan garam dari air laut tergolong contoh perubahan fisik."
+                    },
+                    {
+                        icon: "fa-scissors",
+                        imageLabel: "Kertas Dipotong-potong",
+                        question: "Kertas karton digunting menjadi potongan-potongan kecil. Sifat kertas tetap sama hanya bentuknya yang berubah, dinamakan...",
+                        options: ["Perubahan Fisik", "Perubahan Kimia", "Pembakaran", "Pembusukan"],
+                        answer: 0,
+                        explanation: "Memotong kertas tidak menghasilkan zat baru, hanya ukurannya yang berubah."
+                    },
+                    {
+                        icon: "fa-glass-water",
+                        imageLabel: "Gula Dilarutkan",
+                        question: "Ibu mengaduk gula pasir ke dalam cangkir teh hangat hingga melarut. Peristiwa pelarutan ini termasuk...",
+                        options: ["Perubahan Fisik", "Perubahan Kimia", "Perkaratan", "Pembusukan"],
+                        answer: 0,
+                        explanation: "Pelarutan gula adalah perubahan fisik karena air manis bisa dikristalkan kembali."
+                    }
+                ]
+            },
+
+            // LEVEL 2: Perubahan Kimia Benda (10 Soal IPAS)
+            {
+                level: 2,
+                title: "Level 2: Perubahan Kimia Benda",
+                description: "IPAS - Perubahan yang menghasilkan zat baru",
+                color: "from-emerald-500 to-teal-600",
+                questions: [
+                    {
+                        icon: "fa-fire",
+                        imageLabel: "Kertas Dibakar Jadi Abu",
+                        question: "Kertas yang dibakar api berubah menjadi abu hitam dan tidak dapat kembali menjadi kertas. Perubahan ini disebut...",
+                        options: ["Perubahan Kimia", "Perubahan Fisik", "Mencair", "Menguap"],
+                        answer: 0,
+                        explanation: "Pembakaran kertas menghasilkan abu (zat baru) sehingga tergolong perubahan kimia."
+                    },
+                    {
+                        icon: "fa-apple-whole",
+                        imageLabel: "Buah Apel Membusuk",
+                        question: "Apel yang dibiarkan di tempat terbuka lama-kelamaan membusuk, berubah warna dan berbau. Peristiwa ini tergolong...",
+                        options: ["Perubahan Kimia", "Perubahan Fisik", "Membeku", "Menyublim"],
+                        answer: 0,
+                        explanation: "Pembusukan buah terjadi karena reaksi bakteri yang menghasilkan zat baru."
+                    },
+                    {
+                        icon: "fa-shield-halved",
+                        imageLabel: "Paku Besi Berkarat",
+                        question: "Paku besi yang kehujanan dan terpapar udara berubah warna menjadi cokelat kemerahan (berkarat). Perkaratan adalah contoh...",
+                        options: ["Perubahan Kimia", "Perubahan Fisik", "Pengembunan", "Melarut"],
+                        answer: 0,
+                        explanation: "Karat besi adalah zat baru hasil reaksi besi dengan air dan oksigen."
+                    },
+                    {
+                        icon: "fa-bread-slice",
+                        imageLabel: "Roti Dipanggang / Berjamur",
+                        question: "Bahan adonan roti yang dipanggang menjadi roti matang dengan aroma dan tekstur baru mengalami...",
+                        options: ["Perubahan Kimia", "Perubahan Fisik", "Mencair", "Membeku"],
+                        answer: 0,
+                        explanation: "Proses memasak/memanggang adonan menghasilkan zat baru yang tidak bisa kembali."
+                    },
+                    {
+                        icon: "fa-mortar-pestle",
+                        imageLabel: "Singkong Menjadi Tape",
+                        question: "Singkong yang diberi ragi dan difermentasi berubah menjadi tape yang manis dan beralkohol. Fermentasi ini tergolong...",
+                        options: ["Perubahan Kimia", "Perubahan Fisik", "Menguap", "Mencair"],
+                        answer: 0,
+                        explanation: "Fermentasi ragi menghasilkan rasa dan zat baru pada bahan makanan."
+                    },
+                    {
+                        icon: "fa-leaf",
+                        imageLabel: "Daun Kering Membusuk",
+                        question: "Daun gugur yang membusuk di tanah menjadi pupuk kompos merupakan contoh perubahan wujud zat secara...",
+                        options: ["Kimia", "Fisik", "Mencair", "Membeku"],
+                        answer: 0,
+                        explanation: "Pembusukan sampah organik menjadi pupuk kompos termasuk perubahan kimia."
+                    },
+                    {
+                        icon: "fa-volcano",
+                        imageLabel: "Kembang Api Meletus",
+                        question: "Kembang api yang dinyalakan meletus menghasilkan cahaya warna-warni, suara, dan asap. Proses ini dinamakan...",
+                        options: ["Perubahan Kimia", "Perubahan Fisik", "Mengembun", "Membeku"],
+                        answer: 0,
+                        explanation: "Letusan kembang api adalah reaksi kimia pembakaran yang menghasilkan gas dan energi."
+                    },
+                    {
+                        icon: "fa-cow",
+                        imageLabel: "Susu Basi / Asam",
+                        question: "Susu segar yang dibiarkan di luar kulkas menjadi basi, menggumpal, dan berasa asam. Perubahan ini tergolong...",
+                        options: ["Perubahan Kimia", "Perubahan Fisik", "Melarut", "Menyublim"],
+                        answer: 0,
+                        explanation: "Perubahan sifat susu basi menjadi asam disebabkan oleh reaksi kimia bakteri."
+                    },
+                    {
+                        icon: "fa-tree",
+                        imageLabel: "Kayu Dibakar Arang",
+                        question: "Kayu bakar yang dinyalakan api berubah menjadi arang hitam dan abu. Perubahan ini disebut...",
+                        options: ["Perubahan Kimia", "Perubahan Fisik", "Pengkristalan", "Pengembunan"],
+                        answer: 0,
+                        explanation: "Kayu yang telah terbakar menjadi arang tidak dapat kembali menjadi kayu utuh."
+                    },
+                    {
+                        icon: "fa-egg",
+                        imageLabel: "Telur Digoreng Matang",
+                        question: "Telur mentah yang digoreng di atas wajan berubah menjadi telur mata sapi yang padat dan matang. Ini adalah contoh...",
+                        options: ["Perubahan Kimia", "Perubahan Fisik", "Mencair", "Melarut"],
+                        answer: 0,
+                        explanation: "Panas menggoreng mengubah struktur protein telur secara permanen (kimia)."
+                    }
+                ]
+            }
+        ];
+
+        let playerInfo = {
+            name: "",
+            class: ""
+        };
+        let currentLevelIndex = 0;
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let levelScores = [0, 0];
+        let unlockedLevels = [true, false];
+        let activeQuestions = [];
+
+        function startGame() {
+            playSound('click');
+            const nameInput = document.getElementById('playerName').value.trim();
+            const classInput = document.getElementById('playerClass').value.trim();
+
+            if (!nameInput || !classInput) {
+                alert("Halo Ananda Pintar! Isikan nama dan kelasmu dulu ya sebelum mulai bermain 🙂");
+                return;
+            }
+
+            playerInfo.name = nameInput;
+            playerInfo.class = classInput;
+
+            document.getElementById('playerBadge').innerText = `${playerInfo.name} (${playerInfo.class})`;
+
+            switchScreen('screenLevel');
+            renderLevelMenu();
+        }
+
+        function renderLevelMenu() {
+            const container = document.getElementById('levelButtonsContainer');
+            container.innerHTML = '';
+
+            quizData.forEach((lvl, idx) => {
+                const isUnlocked = unlockedLevels[idx];
+                const btn = document.createElement('button');
+                btn.className = `w-full p-4 rounded-2xl flex items-center justify-between text-left font-bold transition transform active:scale-98 ${
+                    isUnlocked 
+                    ? `bg-gradient-to-r ${lvl.color} text-white shadow-md border-b-4 border-black/20` 
+                    : 'bg-slate-200 text-slate-400 cursor-not-allowed border-2 border-slate-300'
+                }`;
+
+                btn.onclick = () => {
+                    if (isUnlocked) {
+                        playSound('click');
+                        startLevel(idx);
+                    }
+                };
+
+                btn.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-lg">
+                            <i class="fas ${isUnlocked ? 'fa-play' : 'fa-lock'}"></i>
+                        </div>
+                        <div>
+                            <div class="text-sm leading-tight">${lvl.title}</div>
+                            <div class="text-[11px] opacity-90 font-normal">${lvl.description}</div>
+                        </div>
+                    </div>
+                    ${isUnlocked ? `<span class="text-xs bg-white/30 px-2 py-1 rounded-lg">Skor: ${levelScores[idx]}</span>` : ''}
+                `;
+
+                container.appendChild(btn);
+            });
+        }
+
+        function startLevel(lvlIdx) {
+            currentLevelIndex = lvlIdx;
+            currentQuestionIndex = 0;
+            
+            // Mengacak urutan soal dalam level tersebut
+            activeQuestions = shuffleArray([...quizData[lvlIdx].questions]);
+
+            document.getElementById('levelBadge').innerText = `Level ${lvlIdx + 1}`;
+            switchScreen('screenQuiz');
+            loadQuestion();
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function loadQuestion() {
+            const qData = activeQuestions[currentQuestionIndex];
+            
+            // Reset UI Feedback
+            const feedbackBox = document.getElementById('feedbackBox');
+            feedbackBox.className = 'hidden';
+
+            // Update Progress
+            document.getElementById('questionProgress').innerText = `Soal ${currentQuestionIndex + 1}/10`;
+            document.getElementById('currentScore').innerText = `Skor: ${score}`;
+            document.getElementById('progressBar').style.width = `${((currentQuestionIndex + 1) / 10) * 100}%`;
+
+            // Update Gambar Pertanyaan & Teks Label
+            document.getElementById('questionIcon').className = `fas ${qData.icon} text-4xl text-teal-600 mb-1`;
+            document.getElementById('questionImageText').innerText = qData.imageLabel;
+            document.getElementById('questionText').innerText = qData.question;
+
+            // Mempersiapkan Pilihan Jawaban dengan Posisi di-Acak
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+
+            let optionsList = qData.options.map((optText, origIndex) => {
+                return {
+                    text: optText,
+                    isCorrect: origIndex === qData.answer
+                };
+            });
+
+            // Acak pilihan jawaban secara otomatis
+            optionsList = shuffleArray(optionsList);
+
+            optionsList.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = `w-full p-2.5 bg-white hover:bg-teal-50 text-slate-700 font-bold text-xs sm:text-sm rounded-xl border-2 border-teal-200 text-left transition duration-150 shadow-sm flex items-center justify-between active:scale-98`;
+                
+                const letterBadge = String.fromCharCode(65 + index); // A, B, C, D
+                
+                btn.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <span class="w-6 h-6 rounded-lg bg-teal-100 text-teal-700 font-extrabold flex items-center justify-center text-xs">
+                            ${letterBadge}
+                        </span>
+                        <span>${option.text}</span>
+                    </div>
+                    <i class="fas fa-chevron-right text-slate-300 text-xs"></i>
+                `;
+
+                btn.onclick = () => checkAnswer(option.isCorrect, btn, qData);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(isCorrect, selectedBtn, qData) {
+            const allBtns = document.querySelectorAll('#optionsContainer button');
+            allBtns.forEach(b => b.disabled = true);
+
+            const feedbackBox = document.getElementById('feedbackBox');
+            const feedbackIcon = document.getElementById('feedbackIcon');
+            const feedbackText = document.getElementById('feedbackText');
+
+            if (isCorrect) {
+                playSound('correct');
+                score += 10;
+                levelScores[currentLevelIndex] += 10;
+                document.getElementById('currentScore').innerText = `Skor: ${score}`;
+
+                selectedBtn.classList.remove('bg-white', 'border-teal-200');
+                selectedBtn.classList.add('bg-emerald-100', 'border-emerald-500', 'text-emerald-800');
+
+                feedbackBox.className = "mt-3 p-2.5 rounded-xl text-center font-bold text-xs flex items-center justify-center space-x-2 bg-emerald-100 text-emerald-800 border border-emerald-300 animate-bounce";
+                feedbackIcon.className = "fas fa-circle-check text-base text-emerald-600";
+                feedbackText.innerText = `Hebat! ${qData.explanation} ✨`;
+            } else {
+                playSound('wrong');
+                selectedBtn.classList.remove('bg-white', 'border-teal-200');
+                selectedBtn.classList.add('bg-rose-100', 'border-rose-500', 'text-rose-800');
+
+                feedbackBox.className = "mt-3 p-2.5 rounded-xl text-center font-bold text-xs flex items-center justify-center space-x-2 bg-rose-100 text-rose-800 border border-rose-300 animate-bounce";
+                feedbackIcon.className = "fas fa-circle-xmark text-base text-rose-600";
+                feedbackText.innerText = "Ups! Kurang tepat, yuk lebih teliti lagi! 😊";
+            }
+
+            feedbackBox.classList.remove('hidden');
+
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < activeQuestions.length) {
+                    loadQuestion();
+                } else {
+                    finishLevel();
+                }
+            }, 1800);
+        }
+
+        function finishLevel() {
+            if (currentLevelIndex + 1 < quizData.length) {
+                unlockedLevels[currentLevelIndex + 1] = true;
+            }
+
+            if (currentLevelIndex < quizData.length - 1) {
+                alert(`MasyaAllah Selamat! Kamu menyelesaikan Level 1 (Perubahan Fisik)! Yuk lanjut ke Level 2 (Perubahan Kimia)!`);
+                switchScreen('screenLevel');
+                renderLevelMenu();
+            } else {
+                showFinalResults();
+            }
+        }
+
+        function showFinalResults() {
+            playSound('win');
+            
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 120,
+                    spread: 80,
+                    origin: { y: 0.6 }
+                });
+            }
+
+            const totalScore = score; // Maksimal 200 total (2 level x 100 pt)
+            const scaledScore = Math.round((totalScore / 200) * 100);
+            
+            document.getElementById('finalScore').innerText = scaledScore;
+            document.getElementById('correctCount').innerText = `${totalScore / 10}/20 Soal`;
+
+            let predicate = "Cukup Baik";
+            if (scaledScore >= 90) predicate = "Sangat Luar Biasa! 🎉";
+            else if (scaledScore >= 75) predicate = "Sangat Baik! 🌟";
+            else if (scaledScore >= 60) predicate = "Baik 👍";
+
+            document.getElementById('scorePredicate').innerText = predicate;
+
+            switchScreen('screenResult');
+        }
+
+        // Fitur Kirim Hasil ke WhatsApp Bunda Baiti
+        function sendToWhatsApp() {
+            playSound('click');
+            const totalScore = score;
+            const scaledScore = Math.round((totalScore / 200) * 100);
+
+            const message = `Assalamu'alaikum Bunda Baiti, saya sudah selesai mengerjakan Game Edukasi IPAS SDIT AZ-ZAHRA! 🎓%0A%0A` +
+                `👤 *Nama Siswa:* ${playerInfo.name}%0A` +
+                `🏫 *Kelas/Absen:* ${playerInfo.class}%0A` +
+                `⭐ *Total Nilai Akhir:* ${scaledScore} / 100%0A` +
+                `📊 *Rincian Skor Per Level:*%0A` +
+                `- Level 1 (Perubahan Fisik): ${levelScores[0]} / 100 pt%0A` +
+                `- Level 2 (Perubahan Kimia): ${levelScores[1]} / 100 pt%0A%0A` +
+                `Terima kasih Bunda Baiti! ✨`;
+
+            const waUrl = `https://wa.me/6281250033000?text=${message}`;
+            window.open(waUrl, '_blank');
+        }
+
+        function restartGame() {
+            playSound('click');
+            score = 0;
+            levelScores = [0, 0];
+            unlockedLevels = [true, false];
+            currentLevelIndex = 0;
+            currentQuestionIndex = 0;
+
+            switchScreen('screenStart');
+        }
+
+        function switchScreen(screenId) {
+            const screens = ['screenStart', 'screenLevel', 'screenQuiz', 'screenResult'];
+            screens.forEach(id => {
+                const el = document.getElementById(id);
+                if (id === screenId) {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
